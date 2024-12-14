@@ -1,12 +1,14 @@
 import express from 'express'
-import { connectMongo } from './server'
-
+import { connectMongo } from './config/db'
+import { config } from './config/dotenv'
+import userRouters from './routes/userRouter'
 
 const app = express()
-const PORT = process.env.PORT
+const PORT = config.PORT
 app.use(express.json())
 
 
+app.use('/tuComercio/',userRouters)
 
 const startServer = async() =>{
     try{
