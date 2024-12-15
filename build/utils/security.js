@@ -12,28 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const db_1 = require("./config/db");
-const dotenv_1 = require("./config/dotenv");
-const userRouter_1 = __importDefault(require("./routes/userRouter"));
-const cors_1 = __importDefault(require("cors"));
-const app = (0, express_1.default)();
-const PORT = dotenv_1.config.PORT;
-app.use(express_1.default.json());
-app.use((0, cors_1.default)({
-    origin: dotenv_1.config.BASE_URL,
-    credentials: true
-}));
-app.use('/tuComercio/', userRouter_1.default);
-const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, db_1.connectMongo)();
-        app.listen(PORT, () => {
-            console.log('servidor corriendo en el puerto: ', PORT);
-        });
-    }
-    catch (error) {
-        console.log('Error al conectar con el servidor', error);
-    }
+exports.verrifyPassword = exports.hashPassword = void 0;
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const SALT = 10;
+const hashPassword = (password) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield bcrypt_1.default.hash(password, SALT);
 });
-startServer();
+exports.hashPassword = hashPassword;
+const verrifyPassword = (password, hash) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield bcrypt_1.default.compare(password, hash);
+});
+exports.verrifyPassword = verrifyPassword;
