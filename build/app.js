@@ -18,15 +18,16 @@ const dotenv_1 = require("./config/dotenv");
 const userRouter_1 = __importDefault(require("./routes/userRouter"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-const PORT = dotenv_1.config.PORT;
-app.use(express_1.default.json());
 app.use((0, cors_1.default)({
     origin: dotenv_1.config.BASE_URL,
     credentials: true
 }));
+const PORT = dotenv_1.config.PORT;
+app.use(express_1.default.json());
 app.use('/tuComercio/', userRouter_1.default);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(dotenv_1.config.BASE_URL);
         yield (0, db_1.connectMongo)();
         app.listen(PORT, () => {
             console.log('servidor corriendo en el puerto: ', PORT);

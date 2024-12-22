@@ -9,9 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userRegister = void 0;
+exports.userLogin = exports.userRegister = void 0;
 const userModel_1 = require("../models/userModel");
 const security_1 = require("../utils/security");
+const jwtConfig_1 = require("../config/jwtConfig");
 const userRegister = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body['username'];
     const email = req.body['email'];
@@ -45,3 +46,24 @@ const userRegister = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.userRegister = userRegister;
+const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    try {
+        const user = yield userModel_1.userModel.findOne({ email });
+        if (!user) {
+            res.status(404).json({ message: 'usuario no encontrado' });
+        }
+        if (user) {
+            const isPasswordValid = yield (0, security_1.verrifyPassword)(password, user.password);
+            if (!isPasswordValid) {
+                res.status(401).json({ message: 'Contraseña incorrecta' });
+            }
+            const token = (0, jwtConfig_1.createToken)({ id: user._id, email: user.email });
+            res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ message: 'Error en el servidor', err });
+    }
+});
+exports.userLogin = userLogin;

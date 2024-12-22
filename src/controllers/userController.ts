@@ -1,6 +1,8 @@
 import { Request,Response } from "express"
 import { userModel } from "../models/userModel"
-import { hashPassword } from "../utils/security"
+import { hashPassword, verrifyPassword } from "../utils/security"
+import { createToken } from "../config/jwtConfig"
+
 
 
 export const userRegister = async (req:Request,res:Response):Promise<void> =>{
@@ -35,4 +37,27 @@ export const userRegister = async (req:Request,res:Response):Promise<void> =>{
         res.status(500).json({message: 'error'})
     }
     
+}
+
+export const userLogin = async(req:Request,res:Response)=>{
+    const {email,password}=req.body
+
+    try{    
+        const user= await userModel.findOne({email})
+        if(!user){
+            res.status(404).json({message:'usuario no encontrado'})
+        }
+        if(user){
+            const isPasswordValid = await verrifyPassword(password,user.password)
+            if (!isPasswordValid) {
+                res.status(401).json({ message: 'Contraseña incorrecta' });
+            }
+            
+            
+            const token = createToken({id: user._id, email: user.email})
+            res.status(200).json({ message: 'Inicio de sesión exitoso', token });   
+        }   
+    }catch(err){
+        res.status(500).json({ message: 'Error en el servidor', err });
+    }
 }
